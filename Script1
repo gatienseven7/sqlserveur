@@ -1,0 +1,16 @@
+-- Créer une table pour stocker les résultats de la surveillance
+CREATE TABLE dbo.IndexFragmentation
+(
+    IndexName SYSNAME,
+    TableName SYSNAME,
+    FragmentationPercentage DECIMAL(18,2)
+);
+
+-- Insérer les données de fragmentation dans la table
+INSERT INTO dbo.IndexFragmentation
+EXEC sp_spaceused 'YourDatabaseName';
+
+-- Envoyer une alerte si la fragmentation dépasse un seuil
+DECLARE @Threshold DECIMAL(18,2) = 30;
+SELECT * FROM dbo.IndexFragmentation
+WHERE FragmentationPercentage > @Threshold;
