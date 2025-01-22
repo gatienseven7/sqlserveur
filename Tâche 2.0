@@ -1,0 +1,47 @@
+DECLARE @ThresholdPercentage INT = 30; -- Seuil de fragmentation en pourcentage
+
+-- Créer une table temporaire pour stocker les informations sur les index fragmentés
+CREATE TABLE #FragmentedIndexes
+(
+    IndexName SYSNAME,
+    TableName SYSNAME,
+    FragmentationPercentage DECIMAL(18,2)
+);
+
+-- Insérer les informations sur les index fragmentés dans la table temporaire
+INSERT INTO #FragmentedIndexes
+EXEC sp_spaceused 'VotreBaseDeDonnées';
+
+-- Identifier les index à réorganiser ou reconstruire
+DECLARE @IndexName SYSNAME, @TableName SYSNAME;
+
+DECLARE cursor_FragmentedIndexes CURSOR FOR
+SELECT IndexName, TableName
+FROM #FragmentedIndexes
+WHERE FragmentationPercentage >= @ThresholdPercentage;
+
+OPEN cursor_FragmentedIndexes;
+
+FETCH NEXT FROM cursor_FragmentedIndexes INTO @IndexName, @TableName;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    -- Décider si l'index doit être réorganisé ou reconstruit en fonction de la fragmentation
+    IF FragmentationPercentage >= 50
+    BEGIN
+        PRINT 'Reconstruire l''index ' + @IndexName + ' sur la table ' + @TableName;
+        -- ALTER INDEX IX_Customers_LastName ON Customers REBUILD; -- Remplacer par l'instruction appropriée
+    END
+    ELSE
+    BEGIN
+        PRINT 'Réorganiser l''index ' + @IndexName + ' sur la table ' + @TableName;
+        -- ALTER INDEX IX_Customers_LastName ON Customers REORGANIZE; -- Remplacer par l'instruction appropriée
+    END
+
+    FETCH NEXT FROM cursor_FragmentedIndexes INTO @IndexName, @TableName;
+END
+
+CLOSE cursor_FragmentedIndexes;
+DEALLOCATE cursor_FragmentedIndexes;
+
+DROP TABLE #FragmentedIndexes;
