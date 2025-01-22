@@ -1,0 +1,5 @@
+-- Réorganiser un index
+ALTER INDEX IX_Customers_LastName ON Customers REORGANIZE;
+
+-- Reconstruire un index
+ALTER INDEX IX_Orders_OrderDate ON Orders REBUILD;
