@@ -1,0 +1,11 @@
+-- Recherche d'un client par nom (Scan complet sans index)
+SELECT * FROM Clients WHERE Nom = 'Client50000';
+
+-- Factures non payées (Scan complet sur colonne sans index)
+SELECT * FROM Factures WHERE Statut = 'En attente';
+
+-- Recherche des factures entre deux dates
+SELECT * FROM Factures WHERE DateFacture BETWEEN '2023-01-01' AND '2024-01-01';
+
+-- Comptage du nombre de factures par statut
+SELECT Statut, COUNT(*) AS NombreFactures FROM Factures GROUP BY Statut;
